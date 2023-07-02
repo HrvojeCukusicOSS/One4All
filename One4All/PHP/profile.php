@@ -109,6 +109,8 @@
             padding: 4px;
             font-size: 14px;
             width: 50px;
+            min-width: 50px;
+            cursor: pointer;
         }
         #posts_bar{
             margin-top: 20px;
@@ -136,6 +138,7 @@
                     }
                 ?>    
                 <img src="<?php echo $image?>" style="width:100%;">
+                
                 <?php 
                     $image = "../Icons/default.jpg";
                     if(file_exists($user_data['profile_image']))
@@ -144,6 +147,7 @@
                        $image = $image_class->get_thumb_profile( $user_data['profile_image']);
                     }
                 ?>
+                
                 <span>
                     <img id="profile_pic" src="<?php echo $image?>"><br>
                     <a href="change_pfp.php?change=profile" style="font-size:12px; text-decoration: none; color:aquamarine;">
@@ -154,54 +158,52 @@
                     </a>
                 </span>
                 <br>
-                    <div style="font-size: 20px;"><?php echo htmlspecialchars($user_data["first_name"]) . " " . htmlspecialchars($user_data["last_name"])?></div>
+                <div style="font-size: 20px;">
+                    <a href="profile.php?id=<?php echo $user_data['userid'];?>" style="text-decoration: none; color:#91c0ab;">
+                        <?php echo htmlspecialchars($user_data["first_name"]) . " " . htmlspecialchars($user_data["last_name"])?> <br>
+                    </a>
+                    <?php
+                        $followers= "";
+                        if($user_data['likes'] > 0)
+                        {
+                            $followers = "(" . $user_data['likes'] . " Followers)";
+                        }
+                    ?>
+                    <a href="like.php?type=user&id=<?php echo $user_data['userid']?>">
+                        <input id="post_button" type="button" value="Follow <?php echo $followers?>" style="margin-right: 10px; width: auto;">
+                    </a>
+                </div>
                 <br>
-                <a href="index.php"><div id="menu_buttons">Timeline</div></a>
-                <div id="menu_buttons">About</div>
-                <div id="menu_buttons">Friends</div>
-                <div id="menu_buttons">Photos</div>
-                <div id="menu_buttons">Settings</div>
-            </div>
-            <div style="display: flex;">
-                <div id="friends_area" style="min-height: 500px; flex:1;">
-                <div id="friends_bar">
-                    Friends<br>
-                    <?php 
-                            if($friends)
-                            {
-                                foreach ($friends as $FRIEND_ROW)
-                                { 
-                                    include("firend.php");
-                                }
-                            }
-                        ?>
-                </div>    
                 
-                </div>
-                <div id="posts_area" style="min-height: 500px; flex:2.5; padding: 20px; padding-right: 0px;">
-                    <div style="border: solid thin #aaa; padding: 10px; background-color:azure">
-                        <form method="post" enctype="multipart/form-data">
-                            <textarea name="post" placeholder="What's on your mind?" cols="30" rows="5"></textarea>
-                            <input type="file" name="file">
-                            <input id="post_button" type="submit" value="Post" >
-                            <br>
-                        </form>
-                    </div>
-                    <div id="posts_bar">
-                        <?php 
-                            if($posts)
-                            {
-                                foreach ($posts as $ROW) 
-                                {    
-                                    $user = new User();
-                                    $ROW_USER = $user->get_user($ROW["userid"]); 
-                                    include("post.php");
-                                }
-                            }
-                        ?>
-                    </div>
-                </div>
+
+                <a href="index.php"><div id="menu_buttons">Timeline</div></a>
+                <a href="profile.php?section=about&id=<?php echo $user_data['userid'];?>"><div id="menu_buttons">About</div></a>
+                <a href="profile.php?section=followers&id=<?php echo $user_data['userid'];?>"><div id="menu_buttons">Followers</div></a>
+                <a href="profile.php?section=following&id=<?php echo $user_data['userid'];?>"><div id="menu_buttons">Following</div></a>
+                <a href="profile.php?section=photos&id=<?php echo $user_data['userid'];?>"><div id="menu_buttons">Photos</div></a>
+                <a href="profile.php?section=settings"><div id="menu_buttons">Settings</div></a>
             </div>
+            <?php
+                $section = "default";
+                if(isset($_GET['section']))
+                {
+                    $section = $_GET['section'];
+                }
+                if($section == "default")
+                {
+                    include("profile_content_default.php");
+                }else if($section == "photos")
+                {
+                    include("profile_content_photos.php");
+                }else if($section == "followers")
+                {
+                    include("profile_content_followers.php");
+                }else if($section == "following")
+                {
+                    include("profile_content_following.php");
+                }
+                
+            ?>
         </div>
     </body>
 </html>

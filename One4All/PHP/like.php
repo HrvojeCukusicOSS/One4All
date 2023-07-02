@@ -23,7 +23,12 @@
             if(in_array($_GET['type'], $allowed))
             {
                 $post = new Post();
+                $user_class = new User();
                 $post->like_post($_GET['id'], $_GET['type'], $_SESSION["one4all_userid"]);
+                if($_GET['type'] == "user")
+                {
+                    $user_class->follow_user($_GET['id'], $_GET['type'], $_SESSION["one4all_userid"]);
+                }
             }
         }
         

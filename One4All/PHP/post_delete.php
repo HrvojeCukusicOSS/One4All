@@ -2,6 +2,7 @@
     <div >
         <?php 
             $image = "../Icons/default.jpg";
+            $image_class = new Image();
             if(file_exists($ROW_USER['profile_image']))
             {
                 $image = $image_class->get_thumb_profile($user_data['profile_image']);
