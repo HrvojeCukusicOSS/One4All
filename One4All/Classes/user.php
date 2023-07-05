@@ -56,12 +56,12 @@ class User
         if(is_array($result))
         {
             
-            $likes = json_decode($result[0]['following'], true);
+            $following = json_decode($result[0]['following'], true);
 
             $user_ids[] = array();
-            foreach($likes as $like)
+            foreach($following as $follower)
             {
-                $user_ids[] = $like["userid"];
+                $user_ids[] = $follower["userid"];
             }
                 
             if(!in_array($id, $user_ids))
@@ -69,18 +69,26 @@ class User
                 $arr["userid"] = $id;
                 $arr["date"] = date("Y-m-d H:i:s");
 
-                $likes[] = $arr;
+                $following[] = $arr;
 
-                $likes_string = json_encode($likes);
-                $sql = "update likes set following = '$likes_string' where type='$type' && contentid = '$myid' limit 1";
+                $following_string = json_encode($following);
+                $sql = "update likes set following = '$following_string' where type='$type' && contentid = '$myid' limit 1";
                 $DB->save($sql);
             }else
             {
                 $key = array_search($id, $user_ids);
-                unset($likes[$key]);
-                $likes_string = json_encode($likes);
-                $sql = "update likes set following = '$likes_string' where type='$type' && contentid = '$myid' limit 1";
+                $key = $key - 1;
+                unset($following[$key]);
+                $following_string = json_encode($following);
+                $sql = "update likes set following = '$following_string' where type='$type' && contentid = '$myid' limit 1";
                 $DB->save($sql);
+                $sql = "select following from likes where type='$type' && contentid = '$myid' limit 1";
+                $result_F = $DB->read($sql);
+                if(empty($result_F[0]['likes']))
+                {
+                    $sql = "delete from likes where contentid = '$myid' limit 1";
+                    $DB->save($sql);
+                }
             }
         }else
         {

@@ -24,10 +24,14 @@
             {
                 $post = new Post();
                 $user_class = new User();
-                $post->like_post($_GET['id'], $_GET['type'], $_SESSION["one4all_userid"]);
                 if($_GET['type'] == "user")
                 {
+                    $post->like_post($_GET['id'], $_GET['type'], $_SESSION["one4all_userid"]);
                     $user_class->follow_user($_GET['id'], $_GET['type'], $_SESSION["one4all_userid"]);
+                }
+                else if($_GET['type'] == "post")
+                {
+                    $post->like_post($_GET['id'], $_GET['type'], $_SESSION["one4all_userid"]);
                 }
             }
         }
