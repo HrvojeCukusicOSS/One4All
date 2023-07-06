@@ -4,7 +4,7 @@
             $image = "../Icons/default.jpg";
             if(file_exists($ROW_USER['profile_image']))
             {
-                $image = $image_class->get_thumb_profile($user_data['profile_image']);
+                $image = $image_class->get_thumb_profile($ROW_USER['profile_image']);
             }
         ?>
         <img src="<?php echo $image?>" style=" border-radius: 50%; width: 75px; margin: 4px;">                 
@@ -12,8 +12,9 @@
     <div style="width: 100%;">
         <div style="font-weight: bold; color: #91c0ab; width:100%">
             <?php 
+                echo "<a href='profile.php?id=$ROW[userid]' style='text-decoration: none; color:#91c0ab;'>";
                 echo htmlspecialchars($ROW_USER['first_name']) . " " . htmlspecialchars($ROW_USER['last_name']);
-                
+                echo "</a>";
                 if($ROW['is_profile'])
                 {
                     $pronpun = "his";
@@ -47,11 +48,26 @@
             $likes = "";
             $likes = ($ROW['likes'] > 0) ? " (" . $ROW['likes'] . ")": "";
         ?>
+        <?php
+            $comments = "";
+            $comments = ($ROW['comments'] > 0) ? " (" . $ROW['comments'] . ")": "";
+        ?>
         <br><br>
-        <a href="like.php?type=post&id=<?php echo $ROW['postid']?>">Like<?php echo $likes?></a> . <a href="">Comment</a> . 
+        <a href="like.php?type=post&id=<?php echo $ROW['postid']?>">Like<?php echo $likes?></a> . <a href="single_post.php?id=<?php echo $ROW['postid']?>">Comment<?php echo $comments?></a> . 
         <span style="color: #999;">
-            <?php echo htmlspecialchars($ROW['date'])?>
+            <?php
+                $time = new Time();
+                echo $time->get_time($ROW['date']);
+            ?>
         </span>
+        <?php
+            if($ROW['has_image'])
+            {
+                echo ".";
+                echo "<a href='image_view.php?id=$ROW[postid]' style='text-decoration: none;'> View full image </a>";
+                echo ".";
+            }
+        ?>
         <span style="color: #999; float: right;">
             <?php
                 $post = new Post();

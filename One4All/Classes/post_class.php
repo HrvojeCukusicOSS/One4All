@@ -52,10 +52,18 @@ class Post
             {
                 $post = addslashes($data['post']);
             }
-            $postid= $this->create_postid();
-
-            $query = "insert into posts (userid, postid, content, image, has_image, is_profile, is_cover) values ('$userid', '$postid', '$post', '$myimage', '$has_image', '$is_profile', '$is_cover')";
+            $postid = $this->create_postid();
+            $parent = 0;
             $DB= new Database();
+            if(isset($data['parent']) && is_numeric($data['parent']))
+            {
+                $parent = $data['parent'];
+                $sql = "update posts set comments = comments + 1 where postid = '$parent' limit 1";
+                $DB->save($sql);
+            }
+
+            $query = "insert into posts (userid, postid, content, image, has_image, is_profile, is_cover, parent) values ('$userid', '$postid', '$post', '$myimage', '$has_image', '$is_profile', '$is_cover', '$parent')";
+            
             $DB->save($query);
         }else
         {
@@ -77,7 +85,21 @@ class Post
     }
 
     public function get_posts($userid){
-        $query = "select * from posts where userid = '$userid' order by id desc limit 10";
+        $query = "select * from posts where parent = 0 and userid = '$userid' order by id desc limit 10";
+        $DB= new Database();
+        $result = $DB->read($query);
+
+        if($result)
+        {
+            return $result;
+        }else
+        {
+            return false;
+        }
+    }
+
+    public function get_comments($postid){
+        $query = "select * from posts where parent = '$postid' order by id asc limit 10";
         $DB= new Database();
         $result = $DB->read($query);
 
@@ -115,8 +137,23 @@ class Post
         {
             return false;
         }
-        $query = "delete from posts where postid = '$postid' limit 1";
+
         $DB= new Database();
+        $sql = "select parent from posts where postid = '$postid' limit 1";
+        $result = $DB->read($sql);
+
+        if(is_array($result))
+        {
+            if($result[0]['parent'] > 0)
+            {
+                $parent = $result[0]['parent'];
+                $sql = "update posts set comments = comments - 1 where postid = '$parent' limit 1";
+                $DB->save($sql);
+            }
+        }
+        
+
+        $query = "delete from posts where postid = '$postid' limit 1";
         $DB->save($query);
     }
 

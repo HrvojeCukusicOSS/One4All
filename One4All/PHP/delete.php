@@ -4,10 +4,31 @@
     $user_id = $_SESSION["one4all_userid"];
     $login = new Login();
     $user_data = $login->check_login($user_id);
+
+    $USER = $user_data;
+    
+    if(isset($_GET['id']) && is_numeric($_GET['id']))
+    {
+        $profile = new Profile();
+        $profile_data = $profile->get_profile($_GET['id']);
+        if(is_array($profile_data))
+        {
+            $user_data = $profile_data[0];
+        }
+    }
     
     $DB = new Database();
     $error = "";
     $Post = new Post();
+
+    
+    if(isset($_SERVER["HTTP_REFERER"]) && !strpos($_SERVER["HTTP_REFERER"], "delete.php"))
+    {
+        
+        $_SESSION['return_to'] = $_SERVER["HTTP_REFERER"];
+        
+    }
+    
     if(isset($_GET['id']))
     {
         
@@ -25,12 +46,15 @@
     {
         $error = "No such post exists!";
     }
-
+    
     if($_SERVER['REQUEST_METHOD']=="POST")
     {
+        
         $Post->delete_post($_POST['postid']);
-        header("Location: profile.php");
+        
+        header("Location: ". $_SESSION['return_to']);
         die;
+        
     }
 ?>
 

@@ -4,36 +4,20 @@
     $user_id = $_SESSION["one4all_userid"];
     $login = new Login();
     $user_data = $login->check_login($user_id);
-
     $USER = $user_data;
-    
-    if(isset($_GET['id']) && is_numeric($_GET['id']))
+    if(isset($_GET['find']))
     {
-        $profile = new Profile();
-        $profile_data = $profile->get_profile($_GET['id']);
-        if(is_array($profile_data))
-        {
-            $user_data = $profile_data[0];
-        }
-    }
-    
-    $DB = new Database();
-    $error = "";
-    $Post = new Post();
-    $likes = false;
-    if(isset($_GET['id']) && isset($_GET['type']))
-    {
-        $likes = $Post->get_likes($_GET['id'], $_GET['type']);
-    }else
-    {
-        $error = "No data found!";
+        $find = addslashes($_GET['find']);
+        $sql = "select *from users where first_name like '%$find%' || last_name like '%$find%' limit 30";
+        $DB = new Database();
+        $result = $DB->read($sql);
     }
 ?>
 
 <!DOCTYPE html>
 <html>
     <head>
-        <title>People who liked | One4All</title>
+        <title>Search | One4All</title>
     </head>
     <style type="text/css">
         #head_bar{
@@ -117,14 +101,17 @@
                 <div id="posts_area" style="min-height: 500px; flex:2.5; padding: 20px; padding-right: 0px;">
                     <div style="border: solid thin #aaa; padding: 10px; background-color:azure"> 
                         <?php
-                            $User = new User();
+                            $user_class = new User();
                             $image_class=new Image();
-                            if(is_array($likes))
+                            if(is_array($result))
                             {
-                                foreach ($likes as $row) {
-                                    $FRIEND_ROW=$User->get_user($row['userid']);
+                                foreach ($result as $row) {
+                                    $FRIEND_ROW=$user_class->get_user($row['userid']);
                                     include("firend.php");
                                 }
+                            }else
+                            {
+                                echo "No results found :(";
                             }
                         ?>
                         <br style="clear: both;">

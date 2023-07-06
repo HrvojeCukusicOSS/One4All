@@ -4,6 +4,7 @@
     $user_id = $_SESSION["one4all_userid"];
     $login = new Login();
     $user_data = $login->check_login($user_id);
+    $USER = $user_data;
     if($_SERVER['REQUEST_METHOD'] == "POST")
     {
         if(isset($_FILES['file']['name']) && $_FILES['file']['name'] != "")

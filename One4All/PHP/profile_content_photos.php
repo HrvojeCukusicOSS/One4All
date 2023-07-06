@@ -10,7 +10,9 @@
             if(is_array($images))
             {
                 foreach ($images as $image_row) {
+                    echo "<a href='single_post.php?id=$image_row[postid]'>";
                     echo "<img src='" . $image_class->get_thumb_post($image_row['image']) . "' style='width:150px; margin:10px;'/>";
+                    echo "</a>";
                 }
             }else
             {

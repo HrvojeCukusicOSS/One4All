@@ -5,6 +5,7 @@
     $login = new Login();
     $user_data = $login->check_login($user_id);
 
+    
     $USER = $user_data;
     
     if(isset($_GET['id']) && is_numeric($_GET['id']))
@@ -17,47 +18,22 @@
         }
     }
     
-    $DB = new Database();
     $error = "";
     $Post = new Post();
+    $ROW = false;
     if(isset($_GET['id']))
     {
-        
         $ROW = $Post->get_single_posts($_GET['id']);
-        if(!$ROW){
-            $error = "No such post exists!";
-        }else
-        {
-            if($ROW['userid'] != $_SESSION["one4all_userid"])
-            {
-                $error = "Acces denied!";
-            }
-        }
     }else
     {
-        $error = "No such post exists!";
-    }
-    if(isset($_SERVER["HTTP_REFERER"]) && !strpos($_SERVER["HTTP_REFERER"], "edit.php"))
-    {
-        $_SESSION['return_to'] = $_SERVER["HTTP_REFERER"];
-    }else
-    {
-        $_SESSION['return_to'] = "profile.php";
-    }
-    if($_SERVER['REQUEST_METHOD']=="POST")
-    {
-        $Post->edit_post($user_id ,$_POST, $_FILES);
-        
-        
-        header("Location: ". $_SESSION['return_to']);
-        die;
+        $error = "No image found!";
     }
 ?>
 
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Edit post | One4All</title>
+        <title>Single post | One4All</title>
     </head>
     <style type="text/css">
         #head_bar{
@@ -139,33 +115,16 @@
         <div style="width: 800px; margin: auto; min-height:800px;"> 
             <div style="display: flex;">
                 <div id="posts_area" style="min-height: 500px; flex:2.5; padding: 20px; padding-right: 0px;">
-                    <div style="border: solid thin #aaa; padding: 10px; background-color:azure">
-                        <form method="post" enctype="multipart/form-data">
-                            
-                            <?php
-                                if($error != "")
-                                {
-                                    echo $error;
-                                }else
-                                {
-                                    echo "Edit Post<br><br>";
-                                    echo '<textarea name="post" placeholder="What is on your mind?" cols="30" rows="5">'.$ROW['content'].'</textarea>
-                                    <input type="file" name="file">';
-                                    echo "<input name='postid' type='hidden' value='$ROW[postid]'>";
-                                    echo "<input id='post_button' type='submit' value='Save' >";
-                                
-                                    if(file_exists($ROW['image']))
-                                    {
-                                        $image_class = new Image();
-                                        $post_image = $image_class->get_thumb_post($ROW['image']);
-                                        echo "<br><br><div style='text-align:center;'><img src='$post_image' style='width: 80%;'></div>";
-                                    }
-                                }
-                                
-                            ?>
-                            
-                            <br>
-                        </form>
+                    <div style="border: solid thin #aaa; padding: 10px; background-color:azure"> 
+                        <?php
+                            $User = new User();
+                            $image_class=new Image();
+                            if(is_array($ROW))
+                            {
+                                echo "<img src='$ROW[image]' style='width:100%;'/>";
+                            }
+                        ?>
+                        <br style="clear: both;">
                     </div>
                 </div>
             </div>

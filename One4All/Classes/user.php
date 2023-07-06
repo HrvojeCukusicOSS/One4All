@@ -32,20 +32,6 @@ class User
         }
     }
 
-    public function get_friends($user_id)
-    {
-        $query = "select * from users where userid != '$user_id'";
-        $DB = new Database();
-        $result = $DB->read($query);
-        if($result)
-        {
-            return $result;
-        }else
-        {
-            return false;
-        }
-    }
-
     public function follow_user($id, $type, $myid)
     {
         $DB= new Database();

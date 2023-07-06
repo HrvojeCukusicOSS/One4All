@@ -20,26 +20,34 @@
 
     if($_SERVER['REQUEST_METHOD'] == "POST")
     {
-        $post = new Post();
-        $result = $post->create_post($user_id, $_POST, $_FILES);
-        if($result == "")
+        if(isset($_POST['first_name']))
         {
-            header("Location: profile.php");
-            die;
+            $settings_class=new Settings();
+            $settings_class->save_settings($_POST, $user_id);
         }else
         {
-            echo "<div style='text-align:center; font-size:12px; color:white; background-color:grey;'>";
-            echo "<br>The following errors occured <br><br>";
-            echo $result;
-            echo "</div>";
+            $post = new Post();
+            $result = $post->create_post($user_id, $_POST, $_FILES);
+            if($result == "")
+            {
+                header("Location: profile.php");
+                die;
+            }else
+            {
+                echo "<div style='text-align:center; font-size:12px; color:white; background-color:grey;'>";
+                echo "<br>The following errors occured <br><br>";
+                echo $result;
+                echo "</div>";
+            }
         }
+        
     }
     $id = $user_data['userid'];
     $post = new Post();
     $posts = $post->get_posts($id);
 
     $user = new User();
-    $friends = $user->get_friends($id);
+    $friends = $user->get_following($id, "user");
 
     $image_class = new Image();
 ?>
@@ -64,6 +72,16 @@
             background-repeat: no-repeat;
             background-position: right;
             background-size: 15px;
+        }
+        #textbox{
+            width: 100%;
+            height: 20px;
+            border-radius: 5px;
+            border: none;
+            padding: 4px;
+            font-size: 14px;
+            border: solid thin grey;
+            margin: 10px;
         }
         #profile_pic{
             width: 100px;
@@ -166,11 +184,11 @@
                         $followers= "";
                         if($user_data['likes'] > 0)
                         {
-                            $followers = "(" . $user_data['likes'] . " Followers)";
+                            $followers = "(" . $user_data['likes'] . " Friends)";
                         }
                     ?>
                     <a href="like.php?type=user&id=<?php echo $user_data['userid']?>">
-                        <input id="post_button" type="button" value="Follow <?php echo $followers?>" style="margin-right: 10px; width: auto;">
+                        <input id="post_button" type="button" value="Friend <?php echo $followers?>" style="margin-right: 10px; width: auto;">
                     </a>
                 </div>
                 <br>
@@ -178,10 +196,17 @@
 
                 <a href="index.php"><div id="menu_buttons">Timeline</div></a>
                 <a href="profile.php?section=about&id=<?php echo $user_data['userid'];?>"><div id="menu_buttons">About</div></a>
-                <a href="profile.php?section=followers&id=<?php echo $user_data['userid'];?>"><div id="menu_buttons">Followers</div></a>
-                <a href="profile.php?section=following&id=<?php echo $user_data['userid'];?>"><div id="menu_buttons">Following</div></a>
+                <a href="profile.php?section=followers&id=<?php echo $user_data['userid'];?>"><div id="menu_buttons">Mutuals</div></a>
+                <a href="profile.php?section=following&id=<?php echo $user_data['userid'];?>"><div id="menu_buttons">Friends</div></a>
                 <a href="profile.php?section=photos&id=<?php echo $user_data['userid'];?>"><div id="menu_buttons">Photos</div></a>
-                <a href="profile.php?section=settings"><div id="menu_buttons">Settings</div></a>
+                <?php
+                    if($user_data['userid'] == $user_id)
+                    {
+                        echo '<a href="profile.php?section=settings&id='.$user_data['userid'].'"><div id="menu_buttons">Settings</div></a>';
+
+                    }
+                ?>
+                
             </div>
             <?php
                 $section = "default";
@@ -201,6 +226,12 @@
                 }else if($section == "following")
                 {
                     include("profile_content_following.php");
+                }else if($section == "about")
+                {
+                    include("profile_content_about.php");
+                }else if($section == "settings")
+                {
+                    include("profile_content_settings.php");
                 }
                 
             ?>

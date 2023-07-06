@@ -33,6 +33,8 @@
             echo "</div>";
         }
     }
+    $sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
+
 ?>
 
 <!DOCTYPE html>
@@ -121,22 +123,33 @@
         <div style="width: 800px; margin: auto; min-height:800px;"> 
             <div style="display: flex;">
                 <div id="friends_bar"> 
-                <?php 
-                    $image = "../Icons/default.jpg";
-                    if(file_exists($user_data['profile_image']))
-                    {
-                            
-                       $image = $image_class->get_thumb_profile( $user_data['profile_image']);
-                    }
-                ?>
-                <span>
-                    <img id="profile_pic" src="<?php echo $image?>">
-                    <br>
-                    <a href="profile.php" style="color: #91c0ab; text-decoration: none;">
-                        <?php echo htmlspecialchars($user_data['first_name']) . "<br>" . htmlspecialchars($user_data['last_name'])?>
-                    </a>
-                </span>
+                    <?php 
+                        $image = "../Icons/default.jpg";
+                        if(file_exists($user_data['profile_image']))
+                        {
+                                
+                        $image = $image_class->get_thumb_profile( $user_data['profile_image']);
+                        }
+                    ?>
+                    <span>
+                        <img id="profile_pic" src="<?php echo $image?>">
+                        <br>
+                        <a href="profile.php" style="color: #91c0ab; text-decoration: none;">
+                            <?php echo htmlspecialchars($user_data['first_name']) . "<br>" . htmlspecialchars($user_data['last_name'])?>
+                        </a>
+                    </span>
+                    <div>
+                    <form method="get" action="">
+                        <select name="sort">
+                            <option value="newest"<?php if(isset($_GET['sort']) && $_GET['sort'] === 'newest') echo ' selected'; ?>>Newest</option>
+                            <option value="liked"<?php if(isset($_GET['sort']) && $_GET['sort'] === 'liked') echo ' selected'; ?>>Most Liked</option>
+                        </select>
+                        <input type="submit" value="Sort">
+                    </form>
+
+                    </div>
                 </div>
+                
                 <div id="posts_area" style="min-height: 500px; flex:2.5; padding: 20px; padding-right: 0px;">
                     <div style="border: solid thin #aaa; padding: 10px; background-color:azure">
                         <form method="post" enctype="multipart/form-data">
@@ -153,21 +166,31 @@
                             $image_class = new Image();
                             $myuserid = $_SESSION['one4all_userid'];
                             $followers = $user_class->get_following($myuserid, "user");
-                            $sql = "select * from posts where userid = '$myuserid' order by id desc limit 30";
-                            $posts = $DB->read($sql);
+                            if ($sort == 'newest') {
+                                $query = "select * from posts where userid = '$myuserid' and parent = 0 order by id desc limit 30";
+                            } elseif ($sort == 'liked') {
+                                $query = "select * from posts where userid = '$myuserid' and parent = 0 order by likes desc limit 30";
+                            }
+                            $posts = $DB->read($query);
+                            
                             $follower_ids = false;
                             if(is_array($followers))
                             {                                    
                                 $follower_ids = array_column($followers, "userid");
                                 $follower_ids = implode("','", $follower_ids);
                             }
+                            
                             if($follower_ids)
                             {
-                                $sql = "select * from posts where userid = '$myuserid' or userid in('" . $follower_ids . "') order by id desc limit 30";
-                                $posts = $DB->read($sql);
+                                if ($sort == 'newest') {
+                                    $query = "select * from posts where userid = '$myuserid' or userid in('" . $follower_ids . "') and parent = 0 order by id desc limit 30";
+                                } elseif ($sort == 'liked') {
+                                    $query = "select * from posts where userid = '$myuserid' or userid in('" . $follower_ids . "') and parent = 0 order by likes desc limit 30";
+                                }
+                                $posts = $DB->read($query);
                             }
                              
-                            if($posts)
+                            if(isset($posts) && $posts)
                             {
                                     
                                 foreach ($posts as $ROW) 
