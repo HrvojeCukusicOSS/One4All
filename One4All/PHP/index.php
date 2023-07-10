@@ -34,7 +34,6 @@
         }
     }
     $sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
-
 ?>
 
 <!DOCTYPE html>
@@ -103,6 +102,7 @@
             padding: 4px;
             font-size: 14px;
             width: 50px;
+            cursor: pointer;
         }
         #posts_bar{
             margin-top: 20px;
@@ -139,14 +139,14 @@
                         </a>
                     </span>
                     <div>
-                    <form method="get" action="">
-                        <select name="sort">
-                            <option value="newest"<?php if(isset($_GET['sort']) && $_GET['sort'] === 'newest') echo ' selected'; ?>>Newest</option>
-                            <option value="liked"<?php if(isset($_GET['sort']) && $_GET['sort'] === 'liked') echo ' selected'; ?>>Most Liked</option>
-                        </select>
-                        <input type="submit" value="Sort">
-                    </form>
-
+                    <form method="get" action="<?php echo $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET); ?>">
+                        <input type="hidden" name="page" value="<?php echo isset($_GET['page']) ? $_GET['page'] : '1'; ?>">
+                            <select name="sort">
+                                <option value="newest"<?php if(isset($_GET['sort']) && $_GET['sort'] === 'newest') echo ' selected'; ?>>Newest</option>
+                                <option value="liked"<?php if(isset($_GET['sort']) && $_GET['sort'] === 'liked') echo ' selected'; ?>>Most Liked</option>
+                            </select>
+                            <input type="submit" value="Sort">
+                        </form>
                     </div>
                 </div>
                 
@@ -159,48 +159,55 @@
                             <br>
                         </form>
                     </div>
-                    <div id="posts_bar">
-                    <?php                                 
-                            $DB = new Database();
-                            $user_class = new User();
-                            $image_class = new Image();
-                            $myuserid = $_SESSION['one4all_userid'];
-                            $followers = $user_class->get_following($myuserid, "user");
+                    <div id="posts_bar"> 
+                        <?php
+                        $page_number = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                        $page_number = ($page_number < 1) ? 1 : $page_number;
+                        $pg = pagination_link();
+                        $limit = 10;
+                        $offset = ($page_number - 1) * $limit;
+                        $DB = new Database();
+                        $user_class = new User();
+                        $image_class = new Image();
+                        $myuserid = $_SESSION['one4all_userid'];
+                        $followers = $user_class->get_following($myuserid, "user");
+                        if ($sort == 'newest') {
+                            $query = "select * from posts where parent = 0 and userid = '$myuserid' order by id desc limit $limit offset $offset";
+                        } elseif ($sort == 'liked') {
+                            $query = "select * from posts where parent = 0 and userid = '$myuserid' order by likes desc limit $limit offset $offset";
+                        }
+                        $posts = $DB->read($query);
+
+                        $follower_ids = false;
+                        if (is_array($followers)) {
+                            $follower_ids = array_column($followers, "userid");
+                            $follower_ids = implode("','", $follower_ids);
+                        }
+
+                        if ($follower_ids) {
                             if ($sort == 'newest') {
-                                $query = "select * from posts where userid = '$myuserid' and parent = 0 order by id desc limit 30";
+                                $query = "select * from posts where parent = 0 and (userid = '$myuserid' or userid in('" . $follower_ids . "')) order by id desc limit $limit offset $offset";
                             } elseif ($sort == 'liked') {
-                                $query = "select * from posts where userid = '$myuserid' and parent = 0 order by likes desc limit 30";
+                                $query = "select * from posts where parent = 0 and (userid = '$myuserid' or userid in('" . $follower_ids . "')) order by likes desc limit $limit offset $offset";
                             }
                             $posts = $DB->read($query);
-                            
-                            $follower_ids = false;
-                            if(is_array($followers))
-                            {                                    
-                                $follower_ids = array_column($followers, "userid");
-                                $follower_ids = implode("','", $follower_ids);
+                        }
+
+                        if (isset($posts) && $posts) {
+                            foreach ($posts as $ROW) {    
+                                $user = new User();
+                                $ROW_USER = $user->get_user($ROW["userid"]); 
+                                include("post.php");
                             }
-                            
-                            if($follower_ids)
-                            {
-                                if ($sort == 'newest') {
-                                    $query = "select * from posts where userid = '$myuserid' or userid in('" . $follower_ids . "') and parent = 0 order by id desc limit 30";
-                                } elseif ($sort == 'liked') {
-                                    $query = "select * from posts where userid = '$myuserid' or userid in('" . $follower_ids . "') and parent = 0 order by likes desc limit 30";
-                                }
-                                $posts = $DB->read($query);
-                            }
-                             
-                            if(isset($posts) && $posts)
-                            {
-                                    
-                                foreach ($posts as $ROW) 
-                                {    
-                                    $user = new User();
-                                    $ROW_USER = $user->get_user($ROW["userid"]); 
-                                    include("post.php");
-                                }
-                            }
+                        }
                         ?>
+                        
+                        <a href="<?php echo $pg['prev_page']?>">
+                            <input id="post_button" type="button" value="Previous page" style="float: left; width: 100px;">
+                        </a>
+                        <a href="<?php echo $pg['next_page']?>">
+                            <input id="post_button" type="button" value="Next page" style="float: right; width: 100px;">
+                        </a>
                     </div>
                 </div>
             </div>

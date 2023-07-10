@@ -1,4 +1,4 @@
-<div id="friends" style="display:inline-block;">
+<div id="friends" style="display:inline-block; text-align: center;">
     <?php 
         $image = "../Icons/default.jpg";
         if(file_exists($FRIEND_ROW['profile_image']))

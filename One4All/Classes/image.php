@@ -170,6 +170,7 @@ class Image
 
     public function get_thumb_cover($filename)
     {
+        
         $thumbnail = $filename . "_cover_thumb.jpg";
 
         if(file_exists($thumbnail))

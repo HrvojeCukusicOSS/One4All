@@ -1,5 +1,5 @@
 <div style="display: flex;">
-    <div id="friends_area" style="min-height: 500px; flex:1; flex-direction: column;">
+    <div id="friends_area" style="text-align: center; min-height: 500px; flex:0.50; flex-direction: column;">
         <div id="friends_bar">
             Mutuals<br>
             <?php 
@@ -34,7 +34,14 @@
                         include("post.php");
                     }
                 }
+                $pg=pagination_link();
             ?>
+            <a href="<?php echo $pg['prev_page']?>">
+                <input id="post_button" type="button" value="Previous page" style="float: left; width: 100px;">
+            </a>
+            <a href="<?php echo $pg['next_page']?>">
+                <input id="post_button" type="button" value="Next page" style="float: right; width: 100px;">
+            </a>
         </div>
     </div>
 </div>

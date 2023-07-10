@@ -44,7 +44,9 @@
     }
     $id = $user_data['userid'];
     $post = new Post();
-    $posts = $post->get_posts($id);
+    $page_number = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $page_number = ($page_number < 1) ? 1 : $page_number;
+    $posts = $post->get_posts_pagination($id, $page_number);
 
     $user = new User();
     $friends = $user->get_following($id, "user");
@@ -168,12 +170,13 @@
                 
                 <span>
                     <img id="profile_pic" src="<?php echo $image?>"><br>
-                    <a href="change_pfp.php?change=profile" style="font-size:12px; text-decoration: none; color:aquamarine;">
-                        Change pfp
-                    </a> |
-                    <a href="change_pfp.php?change=cover" style="font-size:12px; text-decoration: none; color:aquamarine;">
-                        Change cover
-                    </a>
+                    <?php 
+                        if(i_own_content($user_data))
+                        {
+                            echo "<a href='change_pfp.php?change=profile' style='font-size:12px; text-decoration: none; color:aquamarine;'>Change pfp</a> |";
+                            echo "<a href='change_pfp.php?change=cover' style='font-size:12px; text-decoration: none; color:aquamarine;'>Change cover</a>";
+                        }
+                    ?>
                 </span>
                 <br>
                 <div style="font-size: 20px;">

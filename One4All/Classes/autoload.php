@@ -12,3 +12,4 @@
     include("../Classes/profile_class.php");
     include("../Classes/settings.php");
     include("../Classes/time.php");
+    include("../Classes/functions.php");

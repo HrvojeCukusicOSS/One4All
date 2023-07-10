@@ -24,6 +24,7 @@
             {
                 $post = new Post();
                 $user_class = new User();
+                $single_post = false;
                 if($_GET['type'] == "user")
                 {
                     $post->like_post($_GET['id'], $_GET['type'], $_SESSION["one4all_userid"]);

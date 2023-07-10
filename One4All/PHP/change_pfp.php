@@ -38,14 +38,16 @@
                     {
                         if(file_exists($user_data['cover_image']))
                         {
-                            unlink($user_data['cover_image']);
+                            $to_delete = $user_data['cover_image']."_cover_thumb.jpg";
+                            unlink($to_delete);
                         }
                         $image->resize_image($file, $file, 1500, 1500);
                     }else
                     {
                         if(file_exists($user_data['profile_image']))
                         {
-                            unlink($user_data['profile_image']);
+                            $to_delete = $user_data['profile_image']."_profile_thumb.jpg";
+                            unlink($to_delete);
                         }
                         $image->resize_image($file, $file, 1500, 1500);
                     }

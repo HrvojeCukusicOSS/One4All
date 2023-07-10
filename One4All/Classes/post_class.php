@@ -84,8 +84,11 @@ class Post
         return $num;
     }
 
-    public function get_posts($userid){
-        $query = "select * from posts where parent = 0 and userid = '$userid' order by id desc limit 10";
+    public function get_posts_pagination($userid, $page_number){
+        $page_number = ($page_number < 1) ? 1 : $page_number;              
+        $limit = 10;
+        $offset = ($page_number - 1) * $limit;
+        $query = "select * from posts where parent = 0 and userid = '$userid' order by id desc limit $limit offset $offset";
         $DB= new Database();
         $result = $DB->read($query);
 
@@ -98,8 +101,11 @@ class Post
         }
     }
 
-    public function get_comments($postid){
-        $query = "select * from posts where parent = '$postid' order by id asc limit 10";
+    public function get_comments($postid, $page_number){
+        $page_number = ($page_number < 1) ? 1 : $page_number;              
+        $limit = 10;
+        $offset = ($page_number - 1) * $limit;
+        $query = "select * from posts where parent = '$postid' order by id asc limit $limit offset $offset";
         $DB= new Database();
         $result = $DB->read($query);
 
@@ -138,6 +144,9 @@ class Post
             return false;
         }
 
+        $Post = new Post();
+        $one_post = $Post->get_single_posts($postid);
+
         $DB= new Database();
         $sql = "select parent from posts where postid = '$postid' limit 1";
         $result = $DB->read($sql);
@@ -151,9 +160,29 @@ class Post
                 $DB->save($sql);
             }
         }
-        
 
         $query = "delete from posts where postid = '$postid' limit 1";
+        $DB->save($query);
+
+        if($one_post['image'] !== "" && file_exists($one_post['image']))
+        {
+            unlink($one_post['image']."_post_thumb.jpg");
+            unlink($one_post['image']);
+        }
+        if($one_post['image'] !== "" && file_exists($one_post['image']."_cover_thumb.jpg"))
+        {
+            unlink($one_post['image']."_post_thumb.jpg");
+            unlink($one_post['image']."_cover_thumb.jpg");
+            unlink($one_post['image']);
+        }
+        if($one_post['image'] !== "" && file_exists($one_post['image']."_profile_thumb.jpg"))
+        {
+            unlink($one_post['image']."_post_thumb.jpg");
+            unlink($one_post['image']."_profile_thumb.jpg");
+            unlink($one_post['image']);
+        }
+
+        $query = "delete from posts where parent = '$postid'";
         $DB->save($query);
     }
 
@@ -207,6 +236,8 @@ class Post
                 $DB->save($sql);
                 $sql = "update {$type}s set likes = likes + 1 where {$type}id = '$id' limit 1";
                 $DB->save($sql);
+                $single_post = $this->get_single_posts($id);
+                add_notification($_SESSION['one4all_userid'],"like", $single_post);
             }else
             {
                 $key = array_search($userid, $user_ids);
@@ -240,6 +271,8 @@ class Post
             $DB->save($sql);
             $sql = "update {$type}s set likes = likes + 1 where {$type}id = '$id' limit 1";
             $DB->save($sql);
+            $single_post = $this->get_single_posts($id);
+            add_notification($_SESSION['one4all_userid'],"like", $single_post);
         }
     }
 

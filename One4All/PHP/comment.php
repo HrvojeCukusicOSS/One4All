@@ -14,7 +14,7 @@
     <div>
         <div style="font-weight: bold; color: #91c0ab; width:100%">
             <?php 
-                echo "<a href='profile.php?id=$comment_owner[userid]' style='text-decoration: none; color:#91c0ab;'>";
+                echo "<a href='profile.php&id=$comment_owner[userid]' style='text-decoration: none; color:#91c0ab;'>";
                 echo $comment_owner['first_name'] . " " . $comment_owner['last_name'];
                 echo "</a>";
             ?>
@@ -53,13 +53,11 @@
                 if($post->i_own_post($COMMENT['postid'], $_SESSION['one4all_userid']))
                 {
                     echo "
-                    <a href='edit.php?id=$COMMENT[postid]'>
-                        Edit
-                    </a>
-                    . 
-                    <a href='delete.php?id=$COMMENT[postid]'>
-                        Delete
-                    </a>";
+                    <a href='edit.php?id=$COMMENT[postid]'>Edit</a> . ";
+                }
+                if(i_own_content($COMMENT))
+                {
+                    echo "<a href='delete.php?id=$COMMENT[postid]'>Delete</a>";
                 }
                 
             ?>

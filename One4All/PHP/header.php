@@ -21,6 +21,12 @@
             <a href="logout.php">
                 <span style="font-size: 11px; float: right; margin: 10px; color: azure;">Logout</span>
             </a>
+            <a href="notifications.php">
+                <span style="display: inline-block; position: relative;">
+                    <img src="../Icons/notif.svg" style="width:25px; float:right; margin-top: 10px;">
+                    <div style="background-color: red; color: white; position: absolute; width:12px; height: 12px; right:-12px; border-radius: 50%; padding: 4px; font-size: 14px; text-align:center; margin-top: 2px;"><p style="margin-top: -3px;">0</p></div>
+                </span>
+            </a>
         </div> 
     </form>
 </div>

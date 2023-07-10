@@ -20,7 +20,6 @@
     $DB = new Database();
     $error = "";
     $Post = new Post();
-
     
     if(isset($_SERVER["HTTP_REFERER"]) && !strpos($_SERVER["HTTP_REFERER"], "delete.php"))
     {
@@ -37,7 +36,7 @@
             $error = "No such post exists!";
         }else
         {
-            if($ROW['userid'] != $_SESSION["one4all_userid"])
+            if(!i_own_content($ROW))
             {
                 $error = "Acces denied!";
             }
@@ -47,7 +46,7 @@
         $error = "No such post exists!";
     }
     
-    if($_SERVER['REQUEST_METHOD']=="POST")
+    if($error == "" && $_SERVER['REQUEST_METHOD']=="POST")
     {
         
         $Post->delete_post($_POST['postid']);
@@ -56,6 +55,7 @@
         die;
         
     }
+    
 ?>
 
 <!DOCTYPE html>

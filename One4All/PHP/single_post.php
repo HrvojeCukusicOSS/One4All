@@ -154,14 +154,24 @@
                             </form>
                         </div>
                         <?php 
-                            $comments = $Post->get_comments($ROW['postid']);
+                            $page_number = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                            $page_number = ($page_number < 1) ? 1 : $page_number;
+                            $pg = pagination_link();
+                            $comments = $Post->get_comments($ROW['postid'], $page_number);
                             if(is_array($comments))
                             {
                                 foreach ($comments as $COMMENT) {
                                     include("comment.php");
                                 }
                             }
+                            
                         ?>
+                        <a href="<?php echo $pg['prev_page']?>">
+                            <input id="post_button" type="button" value="Previous page" style="float: left; width: 100px;">
+                        </a>
+                        <a href="<?php echo $pg['next_page']?>">
+                            <input id="post_button" type="button" value="Next page" style="float: right; width: 100px;">
+                        </a>
                     </div>
                 </div>
             </div>
