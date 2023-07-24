@@ -21,7 +21,7 @@
     $error = "";
     $Post = new Post();
     $User = new User();
-    
+    $image_class = new Image();
 ?>
 
 <!DOCTYPE html>
@@ -108,7 +108,7 @@
             background-color: #e6f5f5;
             color: #666;
             border: 1px solid #aaa;
-            margin: 4px;
+            margin: 6px;
         }
 </style>
     <body style="font-family: tahoma; background-color: #F5FCF6;">
@@ -121,7 +121,7 @@
                         <?php
                             $DB = new Database();
                             $id = esc($_SESSION['one4all_userid']);
-                            $query = "select * from notifications where content_owner = '$id' order by id desc limit 30";
+                            $query = "select * from notifications where userid != '$id' and content_owner = '$id' order by id desc limit 30";
                             $data = $DB->read($query);
                         ?>
 

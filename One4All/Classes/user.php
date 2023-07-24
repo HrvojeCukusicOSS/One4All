@@ -60,7 +60,7 @@ class User
                 $following_string = json_encode($following);
                 $sql = "update likes set following = '$following_string' where type='$type' && contentid = '$myid' limit 1";
                 $DB->save($sql);
-                $single_user = $this->get_user($myid);
+                $single_user = $this->get_user($id);
                 add_notification($_SESSION['one4all_userid'],"follow", $single_user);
             }else
             {
@@ -88,7 +88,7 @@ class User
             $following = json_encode($arr2);
             $sql = "insert into likes (type, contentid, following) values ('$type', '$myid', '$following')";
             $DB->save($sql);
-            $single_user = $this->get_user($myid);
+            $single_user = $this->get_user($id);
             add_notification($_SESSION['one4all_userid'],"follow", $single_user);
         }
     }

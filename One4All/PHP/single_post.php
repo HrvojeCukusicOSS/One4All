@@ -134,6 +134,11 @@
                 <div id="posts_area" style="min-height: 500px; flex:2.5; padding: 20px; padding-right: 0px;">
                     <div style="border: solid thin #aaa; padding: 10px; background-color:azure"> 
                         <?php
+                            if(isset($_GET['notif']))
+                            {
+                                notification_seen($_GET['notif']);
+                            }
+
                             $User = new User();
                             $image_class=new Image();
                             if(is_array($ROW))

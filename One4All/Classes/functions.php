@@ -101,6 +101,7 @@ function add_notification($userid, $activity, $row)
     }
     if(isset($row['gender']))
     {
+        $contentid = $row['userid'];
         $content_type = "profile";        
     }
     $query = "insert into notifications (userid, activity, content_owner, date, contentid, content_type) values ('$userid', '$activity', '$content_owner', '$date', '$contentid', '$content_type')";
@@ -136,4 +137,19 @@ function content_i_follow($userid, $row)
 function esc($value)
 {
     return addslashes($value);
+}
+
+function notification_seen($notificationid)
+{
+    $DB = new Database();
+    $notificationid = addslashes($notificationid);
+    $userid = $_SESSION['one4all_userid'] ;
+    $query = "select * from  notification_seen where userid = '$userid' and notificationid = '$notificationid' limit 1";
+    $check = $DB->read($query);
+    if(!is_array($check))
+    {
+        $query = "insert into notification_seen (userid, notificationid) values ('$userid','$notificationid')";
+        $DB->save($query);
+    }
+    
 }

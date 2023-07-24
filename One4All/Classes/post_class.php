@@ -236,8 +236,11 @@ class Post
                 $DB->save($sql);
                 $sql = "update {$type}s set likes = likes + 1 where {$type}id = '$id' limit 1";
                 $DB->save($sql);
-                $single_post = $this->get_single_posts($id);
-                add_notification($_SESSION['one4all_userid'],"like", $single_post);
+                if($type != "user")
+                {
+                    $single_post = $this->get_single_posts($id);
+                    add_notification($_SESSION['one4all_userid'],"like", $single_post);
+                }
             }else
             {
                 $key = array_search($userid, $user_ids);
@@ -271,8 +274,11 @@ class Post
             $DB->save($sql);
             $sql = "update {$type}s set likes = likes + 1 where {$type}id = '$id' limit 1";
             $DB->save($sql);
-            $single_post = $this->get_single_posts($id);
-            add_notification($_SESSION['one4all_userid'],"like", $single_post);
+            if($type != "user")
+            {
+                $single_post = $this->get_single_posts($id);
+                add_notification($_SESSION['one4all_userid'],"like", $single_post);
+            }
         }
     }
 
